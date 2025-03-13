@@ -1,0 +1,152 @@
+[
+  {
+    "script_name": "WeldAbsSpeed",
+    "message": "%{tr_dobot_welding_arc_speed}",
+    "script_code": "WeldAbsSpeed(10, \"mm/s\")"
+  },
+  {
+    "script_name": "WeldMethod",
+    "message": "%{tr_dobot_weld_method}",
+    "script_code": "WeldMethod('flat')"
+  },
+  {
+    "script_name": "WeldJobNumber",
+    "message": "%{tr_dobot_weld_job_number}",
+    "script_code": "WeldJobNumber(1)"
+  },
+  {
+    "script_name": "WeldProcessNumber",
+    "message": "%{tr_dobot_weld_process_number}",
+    "script_code": "WeldProcessNumber(1)"
+  },
+  {
+    "script_name": "WeldArcParams",
+    "message": "%{tr_dobot_weld_arc_params}",
+    "script_code": "WeldArcParams(1)"
+  },
+  {
+    "script_name": "WeldArcStart",
+    "message": "%{tr_dobot_weld_arc_start}",
+    "script_code": "WeldArcStart()"
+  },
+  {
+    "script_name": "WeldArcEnd",
+    "message": "%{tr_dobot_weld_arc_end}",
+    "script_code": "WeldArcEnd()"
+  },
+  {
+    "script_name": "WeldWeaveParams",
+    "message": "%{tr_dobot_weld_weave_params}",
+    "script_code": "WeldWeaveParams(1)"
+  },
+  {
+    "script_name": "WeldWeaveStart",
+    "message": "%{tr_dobot_weld_weave_start}",
+    "script_code": "WeldWeaveStart()"
+  },
+  {
+    "script_name": "WeldWeaveEnd",
+    "message": "%{tr_dobot_weld_weave_end}",
+    "script_code": "WeldWeaveEnd()"
+  },
+  {
+    "script_name": "WeldThroughArc",
+    "message": "%{tr_dobot_weld_through_arc}",
+    "script_code": "WeldThroughArc(0, 0)"
+  },
+  {
+    "script_name": "LaserPositioning",
+    "message": "%{tr_dobot_laser_positioning}",
+    "script_code": "LaserPositioning()"
+  },
+  {
+    "script_name": "CalcOffset",
+    "message": "%{tr_dobot_laser_positioning_calc_offset}",
+    "script_code": "local laser_table = {}\nlaser_table[\"offsetType\"] = 1\nlaser_table[\"datumPoint1\"] = {0,0,0,0,0,0}\nlaser_table[\"measurePoint1\"] ={0,0,0,0,0,0}\nlocal offset = CalcOffset(laser_table)"
+  },
+  {
+    "script_name": "OffsetStart",
+    "message": "%{tr_dobot_laser_positioning_start}",
+    "script_code": "OffsetStart(offset)"
+  },
+  {
+    "script_name": "OffsetEnd",
+    "message": "%{tr_dobot_laser_positioning_calc_end}",
+    "script_code": "OffsetEnd()"
+  },
+  {
+    "script_name": "CommonLaserOffset",
+    "message": "%{tr_dobot_weld_script_by_id_14}",
+    "script_code": "CommonLaserOffset(0,0,0,0)"
+  },
+  {
+    "script_name": "CommonLaserTrackStart",
+    "message": "%{tr_dobot_weld_script_by_id_11}",
+    "script_code": "CommonLaserTrackStart(1,0)"
+  },
+  {
+    "script_name": "CommonLaserTrackEnd",
+    "message": "%{tr_dobot_weld_script_by_id_12}",
+    "script_code": "CommonLaserTrackEnd()"
+  },
+  {
+    "script_name": "FullVLaserCalibrate",
+    "message": "%{tr_dobot_weld_script_by_id_13}",
+    "script_code": "laser_autocaliPointArr = {P1,P2,P3,P4,P5}\nFullVLaserCalibrate(laser_autocaliPointArr, {v = 50, a = 50})"
+  },
+  {
+    "script_name": "YLLaserCalibrate",
+    "message": "%{tr_dobot_laser_cali}",
+    "script_code": "laser_autocaliPointArr = {P1,P2,P3,P4,P5}\nYLLaserCalibrate(laser_autocaliPointArr, {v = 50, a = 50})"
+  },
+  {
+    "script_name": "WeldMultiPassStart",
+    "message": "%{tr_dobot_weld_script_by_id_1}",
+    "script_code": "WeldMultiPassStart(1)"
+  },
+  {
+    "script_name": "WeldMultiPassEnd",
+    "message": "%{tr_dobot_weld_script_by_id_2}",
+    "script_code": "WeldMultiPassEnd()"
+  },
+  {
+    "script_name": "ArcTrackStart",
+    "message": "%{tr_dobot_weld_script_by_id_3}",
+    "script_code": "ArcTrackStart(1)"
+  },
+  {
+    "script_name": "ArcTrackEnd",
+    "message": "%{tr_dobot_weld_script_by_id_4}",
+    "script_code": "ArcTrackEnd()"
+  },
+  {
+    "script_name": "WeldWireFeed",
+    "message": "%{tr_dobot_weld_script_by_id_5}",
+    "script_code": "WeldWireFeed(1000)"
+  },
+  {
+    "script_name": "WeldWireBack",
+    "message": "%{tr_dobot_weld_script_by_id_6}",
+    "script_code": "WeldWireBack(1000)"
+  },
+  {
+    "script_name": "WeldGasFeed",
+    "message": "%{tr_dobot_weld_script_by_id_7}",
+    "script_code": "WeldGasFeed(1000)"
+  },
+  {
+    "script_name": "WeldLaserParams",
+    "message": "%{tr_dobot_weld_script_by_id_8}",
+    "script_code": "WeldLaserParams(1)"
+  },
+  {
+    "script_name": "WeldLaserStart",
+    "message": "%{tr_dobot_weld_script_by_id_9}",
+    "script_code": "WeldLaserStart()"
+  },
+  {
+    "script_name": "WeldLaserEnd",
+    "message": "%{tr_dobot_weld_script_by_id_10}",
+    "script_code": "WeldLaserEnd()"
+  }
+]

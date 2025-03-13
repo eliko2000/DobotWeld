@@ -1,0 +1,9 @@
+{
+  "name": "Weld",
+  "description": "%{tr_dobot_description_weld}",
+  "version": "2-2-0-stable",
+  "mqtt": {
+    "clientId": "Weld",
+    "subscribe": ["addCurrentPoint"]
+  }
+}

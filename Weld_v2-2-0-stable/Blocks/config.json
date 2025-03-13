@@ -1,0 +1,1396 @@
+[
+  {
+    "block_name": "WeldTemplate",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_TEMPLATE",
+      "page": "WeldTemplate.html",
+      "width": 750,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_TEMPLATE",
+        "params": []
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "approachPointData",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "startPointData",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "endPointData",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "leavingPointData",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "middlePointData",
+            "default": "{}"
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "paramsData",
+            "default": "{}"
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "approachPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "startPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "endPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "leavingPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "middlePointParams",
+            "default": "{}"
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "params",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "pointConfigList",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "local approachPointData = {approachPointData}\nlocal startPointData = {startPointData}\nlocal endPointData = {endPointData}\nlocal leavingPointData = {leavingPointData}\nlocal params = {paramsData}\nlocal approachMovParams = {user = approachPointData.user, tool = approachPointData.tool}\nif approachPointData.advancedParams.speed.check then\n  approachMovParams.v = approachPointData.advancedParams.speed.value\nend\nif approachPointData.advancedParams.accel.check then\n  approachMovParams.a = approachPointData.advancedParams.accel.value\nend\nif approachPointData.advancedParams.cp.check then\n  approachMovParams.cp = approachPointData.advancedParams.cp.value\nend\nWeldAbsSpeed(params.weldSpeed, params.weldSpeedUnit)\nif approachPointData.mode == 2 then\n  MovJ({joint = approachPointData.selectPoint[1]}, approachMovParams)\nelse\n  MovL({pose = approachPointData.selectPoint[1]}, approachMovParams)\nend\n\nMovL({pose = startPointData.selectPoint[1]},{user = startPointData.user, tool = startPointData.tool})\nif params.mode ~= nil then\n  WeldMethod(params.mode)\nend\nif (params.mode == nil or params.mode == 'job') and params.jobNumber ~= nil then\n  DobotAddTask({\"WeldJobNumber\", tostring(params.jobNumber)})\nend\nif params.processNumber ~= nil then\n  DobotAddTask({\"WeldProcessNumber\", tostring(params.processNumber)})\nend\nif params.mode ~= 'job' and params.weldParamsNumber ~= nil then\n  WeldArcParams(params.weldParamsNumber)\nend\nlocal weaveFlag = false\nif params.weaveParamsCheck and params.weaveParamsNumber ~= nil then\n  WeldWeaveParams(params.weaveParamsNumber)\n  WeldWeaveStart()\n  weaveFlag = true\nend\nWeldArcStart()\n{middlePointData}\nMovL({pose = endPointData.selectPoint[1]},{user = endPointData.user, tool = endPointData.tool})\nif weaveFlag then\n  WeldWeaveEnd()\nend\nWeldArcEnd()\nlocal leaveMovParams = {user = leavingPointData.user, tool = leavingPointData.tool}\nif leavingPointData.advancedParams.speed.check then\n  leaveMovParams.v = leavingPointData.advancedParams.speed.value\nend\nif leavingPointData.advancedParams.accel.check then\n  leaveMovParams.a = leavingPointData.advancedParams.accel.value\nend\nif leavingPointData.advancedParams.cp.check then\n  leaveMovParams.cp = leavingPointData.advancedParams.cp.value\nend\nif leavingPointData.mode == 1 then\n  Arc({pose = leavingPointData.selectPoint[1]}, {pose = leavingPointData.selectPoint[2]}, leaveMovParams)\nelse\n  MovL({pose = leavingPointData.selectPoint[1]}, leaveMovParams)\nend\n"
+    ]
+  },
+  {
+    "block_name": "WeldAbsSpeed",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELDING_SPEED",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "speed",
+            "default": "10"
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "unit",
+            "default": "",
+            "options": [
+              { "label": "mm/s", "value": "\"mm/s\"" },
+              { "label": "mm/min", "value": "\"mm/min\"" },
+              { "label": "cm/min", "value": "\"cm/min\"" }
+            ]
+          }
+        ]
+      }
+    ],
+    "block_code": ["WeldAbsSpeed({speed},{unit})\n"]
+  },
+  {
+    "block_name": "WeldMethod",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_WORK_METHOD",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "type",
+            "default": "",
+            "options": [
+              {
+                "label": "null",
+                "value": "default"
+              }
+            ],
+            "update": {
+              "type": "lua",
+              "function": "getWeldModeMapper",
+              "args": {
+                "type": "field",
+                "value": ""
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "block_code": ["WeldMethod(\"{type}\")\n"]
+  },
+  {
+    "block_name": "WeldJobNumber",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_JOB",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "jobNumber",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": ["DobotAddTask({\"WeldJobNumber\", \"{jobNumber}\"})\n"]
+  },
+  {
+    "block_name": "WeldProcessNumber",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_PROCESS_NUMBER",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "processNumber",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "DobotAddTask({\"WeldProcessNumber\", \"{processNumber}\"})\n"
+    ]
+  },
+  {
+    "block_name": "WeldArcParams",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_ARC_PARAMS",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "number",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": ["WeldArcParams({number})\n"]
+  },
+  {
+    "block_name": "WeldArcStart",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_ARC_START",
+        "params": []
+      }
+    ],
+    "block_code": ["WeldArcStart()\n"]
+  },
+  {
+    "block_name": "WeldArcEnd",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_ARC_END",
+        "params": []
+      }
+    ],
+    "block_code": ["WeldArcEnd()\n"]
+  },
+  {
+    "block_name": "WeldWeaveParams",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_WEAVE_PARMAS",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "index",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": ["WeldWeaveParams({index})\n"]
+  },
+  {
+    "block_name": "WeldWeaveStart",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_WEAVE_START",
+        "params": []
+      }
+    ],
+    "block_code": ["WeldWeaveStart()\n"]
+  },
+  {
+    "block_name": "WeldWeaveEnd",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_WEAVE_END",
+        "params": []
+      }
+    ],
+    "block_code": ["WeldWeaveEnd()\n"]
+  },
+  {
+    "block_name": "WeldStation",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_BLOCK_BY_ID_18",
+      "page": "MultiStation.html",
+      "width": 700,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_17",
+        "params": []
+      },
+      {
+        "message": "%1",
+        "params": [
+          {
+            "param_type": "input_statement",
+            "data_type": "",
+            "name": "substack1",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_19",
+        "params": [],
+        "message_align": "RIGHT"
+      },
+      {
+        "message": "%1",
+        "params": [
+          {
+            "param_type": "input_statement",
+            "data_type": "",
+            "name": "substack2",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_20",
+        "params": [],
+        "message_align": "RIGHT"
+      },
+      {
+        "message": "%1",
+        "params": [
+          {
+            "param_type": "input_statement",
+            "data_type": "",
+            "name": "substack3",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "OrderDI1",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "OrderCancelDI1",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "StateDO1",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "OrderDI2",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "OrderCancelDI2",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "StateDO2",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "OrderDI3",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "OrderCancelDI3",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "math_number",
+            "name": "StateDO3",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "-- 主程序，根据工位的预约情况，进行程序的运行\nwhile true do\n  if g_STA1_state == STA_ORDERED and #order_list and order_list[1] == 1 then\n    g_STA1_state = STA_WORKING\n    orderListHandle(1)\n    do\n      {substack1}    \n    end\n    dobotTool._Sync()\n    g_STA1_state = STA_IDLE\n  end\n  if g_STA2_state == STA_ORDERED and #order_list and order_list[1] == 2 then\n    g_STA2_state = STA_WORKING\n    orderListHandle(1)\n    do\n      {substack2}\n    end\n    dobotTool._Sync()\n    g_STA2_state = STA_IDLE\n  end\n  if g_STA3_state == STA_ORDERED and #order_list and order_list[1] == 3 then\n    g_STA3_state = STA_WORKING\n    orderListHandle(1)\n    do\n      {substack3}\n    end\n    dobotTool._Sync()\n    g_STA3_state = STA_IDLE\n  end\n  Wait(10)\nend\n",
+      "-- 根据I/O的状态，进行工位的预约以及取消。做法和状态机类似\nwhile true do\n  if g_STA1_order_di ~= 0 then\n    -- 工位1预约及其取消\n    if g_STA1_state == STA_IDLE then\n      if DI(g_STA1_order_di) == 1 and DI(g_STA1_order_cancel_di) == 0 then\n        g_STA1_state = STA_ORDERED\n        orderListHandle(1, true)\n      end\n    elseif g_STA1_state == STA_ORDERED then\n      if DI(g_STA1_order_cancel_di) == 1 then\n        g_STA1_state = STA_IDLE\n        orderListHandle(1, false)\n      end\n    end\n  end\n  if g_STA2_order_di ~= 0 then\n    -- 工位2预约及其取消\n    if g_STA2_state == STA_IDLE then\n      if DI(g_STA2_order_di) == 1 and DI(g_STA2_order_cancel_di) == 0 then\n        g_STA2_state = STA_ORDERED\n        orderListHandle(2, true)\n      end\n    elseif g_STA2_state == STA_ORDERED then\n      if DI(g_STA2_order_cancel_di) == 1 then\n        g_STA2_state = STA_IDLE\n        orderListHandle(2, false)\n      end\n    end\n  end\n  if g_STA3_order_di ~= 0 then\n    -- 工位3预约及其取消\n    if g_STA3_state == STA_IDLE then\n      if DI(g_STA3_order_di) == 1 and DI(g_STA3_order_cancel_di) == 0 then\n        g_STA3_state = STA_ORDERED\n        orderListHandle(3, true)\n      end\n    elseif g_STA3_state == STA_ORDERED then\n      if DI(g_STA3_order_cancel_di) == 1 then\n        g_STA3_state = STA_IDLE\n        orderListHandle(3, false)\n      end\n    end\n  end\nend\n",
+      "-- 根据工位的情况，进行DO的输出\nlocal_STA1_LED_state_previous = LED_UNINIT\nlocal_STA1_LED_twinkle_count = 0\nlocal_STA2_LED_state_previous = LED_UNINIT\nlocal_STA2_LED_twinkle_count = 0\nlocal_STA3_LED_state_previous = LED_UNINIT\nlocal_STA3_LED_twinkle_count = 0\nwhile true do\n    if g_STA1_state_do ~= 0 then\n        -- LED control of station1\n        if g_STA1_state == STA_IDLE then\n            g_STA1_LED_state = LED_TWINKLE\n        elseif g_STA1_state == STA_ORDERED then\n            g_STA1_LED_state = LED_LIGHTON\n        else\n            g_STA1_LED_state = LED_LIGHTOFF\n        end\n        if g_STA1_LED_state == LED_TWINKLE then\n            if local_STA1_LED_state_previous ~= g_STA1_LED_state then\n                local_STA1_LED_twinkle_count = 0\n            end\n            local_STA1_LED_twinkle_count = local_STA1_LED_twinkle_count + 1\n            if local_STA1_LED_twinkle_count % 5 == 1 then\n                DO(g_STA1_state_do, ON)\n            elseif local_STA1_LED_twinkle_count % 5 == 2 then\n                DO(g_STA1_state_do, OFF)\n            end\n        elseif g_STA1_LED_state == LED_LIGHTON then\n            if local_STA1_LED_state_previous ~= g_STA1_LED_state then\n                DO(g_STA1_state_do, ON)\n            end\n        elseif g_STA1_LED_state == LED_LIGHTOFF then\n            if local_STA1_LED_state_previous ~= g_STA1_LED_state then\n                DO(g_STA1_state_do, OFF)\n            end\n            --Wait(50)\n        end\n        local_STA1_LED_state_previous = g_STA1_LED_state\n    end\n    if g_STA2_state_do ~= 0 then\n        -- LED control of station2\n        if g_STA2_state == STA_IDLE then\n            g_STA2_LED_state = LED_TWINKLE\n        elseif g_STA2_state == STA_ORDERED then\n            g_STA2_LED_state = LED_LIGHTON\n        else\n            g_STA2_LED_state = LED_LIGHTOFF\n        end\n        if g_STA2_LED_state == LED_TWINKLE then\n            if local_STA2_LED_state_previous ~= g_STA2_LED_state then\n                local_STA2_LED_twinkle_count = 0\n            end\n            local_STA2_LED_twinkle_count = local_STA2_LED_twinkle_count + 1\n            if local_STA2_LED_twinkle_count % 5 == 1 then\n                DO(g_STA2_state_do, ON)\n            elseif local_STA2_LED_twinkle_count % 5 == 2 then\n                DO(g_STA2_state_do, OFF)\n            end\n        elseif g_STA2_LED_state == LED_LIGHTON then\n            if local_STA2_LED_state_previous ~= g_STA2_LED_state then\n                DO(g_STA2_state_do, ON)\n            end\n        elseif g_STA2_LED_state == LED_LIGHTOFF then\n            if local_STA2_LED_state_previous ~= g_STA2_LED_state then\n                DO(g_STA2_state_do, OFF)\n            end\n            --Wait(50)\n        end\n        local_STA2_LED_state_previous = g_STA2_LED_state\n    end\n    if g_STA3_state_do ~= 0 then\n        -- LED control of station3\n        if g_STA3_state == STA_IDLE then\n            g_STA3_LED_state = LED_TWINKLE\n        elseif g_STA3_state == STA_ORDERED then\n            g_STA3_LED_state = LED_LIGHTON\n        else\n            g_STA3_LED_state = LED_LIGHTOFF\n        end\n        if g_STA3_LED_state == LED_TWINKLE then\n            if local_STA3_LED_state_previous ~= g_STA3_LED_state then\n                local_STA3_LED_twinkle_count = 0\n            end\n            local_STA3_LED_twinkle_count = local_STA3_LED_twinkle_count + 1\n            if local_STA3_LED_twinkle_count % 5 == 1 then\n                DO(g_STA3_state_do, ON)\n            elseif local_STA3_LED_twinkle_count % 5 == 3 then\n                DO(g_STA3_state_do, OFF)\n            end\n        elseif g_STA3_LED_state == LED_LIGHTON then\n            if local_STA3_LED_state_previous ~= g_STA3_LED_state then\n                DO(g_STA3_state_do, ON)\n            end\n        elseif g_STA3_LED_state == LED_LIGHTOFF then\n            if local_STA3_LED_state_previous ~= g_STA3_LED_state then\n                DO(g_STA3_state_do, OFF)\n            end\n            --Wait(50)\n        end\n        local_STA3_LED_state_previous = g_STA3_LED_state\n    end\nend\n"
+    ],
+    "block_global_var": "--[[\n在实现时，以一个三工位位为例:\n机器人idle时：闪烁，可预约;\n机器人变为order时：已预约上，灯常亮;\n机器人变为working时：已经在干活了，灯灭;\n干完活后，继续变为idle.\n--]] -- Station state const definition\nSTA_IDLE = 0\nSTA_ORDERED = 1\nSTA_WORKING = 2\n-- LED output state const definition\nLED_UNINIT = -1\nLED_TWINKLE = 0\nLED_LIGHTON = 1\nLED_LIGHTOFF = 2\n-- Station1 I/O definition\ng_STA1_order_di = {OrderDI1}\ng_STA1_order_cancel_di = {OrderCancelDI1}\ng_STA1_state_do = {StateDO1}\n-- Station1 variable definition\ng_STA1_state = STA_IDLE\ng_STA1_LED_state = LED_TWINKLE\n-- Station2 I/O definition\ng_STA2_order_di = {OrderDI2}\ng_STA2_order_cancel_di = {OrderCancelDI2}\ng_STA2_state_do = {StateDO2}\n-- Station2 variable definition\ng_STA2_state = STA_IDLE\ng_STA2_LED_state = LED_TWINKLE\n-- Station3 I/O definition\ng_STA3_order_di = {OrderDI3}\ng_STA3_order_cancel_di = {OrderCancelDI3}\ng_STA3_state_do = {StateDO3}\n-- Station3 variable definition\ng_STA3_state = STA_IDLE\ng_STA3_LED_state = LED_TWINKLE\n\nlockerName = \"order_list_handle_lock\"\norder_list = {}\nfunction orderListHandle(index, status)\n  if Lock(lockerName, 1000, 1000) then\n    if status == nil then\n      table.remove(order_list, 1)\n      UnLock(lockerName)\n      return\n    end\n    if status then\n      table.insert(order_list, index)\n    else\n      if #order_list ~= 0 then\n        for i,v in ipairs(order_list) do\n          if v == index then\n            table.remove(order_list, i)\n          end\n        end\n      end\n    end\n    UnLock(lockerName)\n  end\nend\n"
+  },
+  {
+    "block_name": "WeldThroughArc",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_THROUGH_ARC",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "current",
+            "default": "0"
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "voltage",
+            "default": "0"
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "DobotAddTask({\"WeldArcCurrent\", \"{current}\"})\nDobotAddTask({\"WeldArcVoltage\", \"{voltage}\"})\n"
+    ]
+  },
+  {
+    "block_name": "WeldWireGas",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_10",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "type",
+            "default": "",
+            "options": [
+              { "label": "DOBOTPLUS_WELD_BLOCK_BY_ID_7", "value": "1" },
+              { "label": "DOBOTPLUS_WELD_BLOCK_BY_ID_8", "value": "2" },
+              { "label": "DOBOTPLUS_WELD_BLOCK_BY_ID_9", "value": "3" }
+            ]
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "waitTime",
+            "default": "0"
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "local type = {type}\nif type == 1 then\n WeldWireFeed({waitTime})\nelseif type == 2 then\n WeldWireBack({waitTime})\nelse\n WeldGasFeed({waitTime})\nend\n"
+    ]
+  },
+  {
+    "block_name": "LaserPosition",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_LASER_POSITION_SET",
+      "page": "LaserPosition.html",
+      "width": 800,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_POSITION",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "basePointNumber",
+            "default": "1"
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "offsetNumber",
+            "default": "1"
+          }
+        ]
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositonType",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositonParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositionPointData",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositionLua",
+            "default": "ReportEcoStop(Language.trLang(\"PLEASE_CONFIG_BLOCK_FIRST\"))\n"
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositionBaseAlias",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositionBaseReferPoint",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositionWaitTime",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserPositionTransitons",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "local basePointNumber = {basePointNumber}\nlocal offsetNumber = {offsetNumber}\n{laserPositionLua}"
+    ]
+  },
+  {
+    "block_name": "ContactPosition",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_BLOCK_BY_ID_4",
+      "page": "ContactPosition.html",
+      "width": 800,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_3",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "basePointNumber",
+            "default": "1"
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "offsetNumber",
+            "default": "1"
+          }
+        ]
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "contactPositonType",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "contactPositonParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "contactPositionPointData",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "contactPositionLua",
+            "default": "ReportEcoStop(Language.trLang(\"PLEASE_CONFIG_BLOCK_FIRST\"))\n"
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "contactPositionPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "datumPointAlias",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "referPoint",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "local basePointNumber = {basePointNumber}\nlocal offsetNumber = {offsetNumber}\n{contactPositionLua}"
+    ]
+  },
+  {
+    "block_name": "LaserPositionStart",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_POSITION_OFFSET_START",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "offsetNumber",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": ["OffsetStart(laser_offset[{offsetNumber}])\n"]
+  },
+  {
+    "block_name": "LaserPositionEnd",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_POSITION_OFFSET_END",
+        "params": []
+      }
+    ],
+    "block_code": ["OffsetEnd()\n"]
+  },
+  {
+    "block_name": "LaserPosTargetMovL",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_POSITION_TARGET_MOL",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point1",
+            "default": ""
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "time",
+            "default": "2000"
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "job",
+            "default": "1"
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point2",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "MovL({dobot_teach_point1})\nWait({time})\nlocal laser_pos = LaserPositioning({dobot_teach_point1}, {job})\nif laser_pos == nil then\n    error(\"Laser positioning failed！\")\nend\nlocal laser_absPos = {point = {pose = {laser_pos[1], laser_pos[2], laser_pos[3], {dobot_teach_point2}.pose[4], {dobot_teach_point2}.pose[5], {dobot_teach_point2}.pose[6]}}, user={dobot_teach_point2}.user, tool={dobot_teach_point2}.tool}\nMovL(laser_absPos.point, {user=laser_absPos.user, tool=laser_absPos.tool})\n"
+    ]
+  },
+  {
+    "block_name": "GetLaserPosTarget",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_POSITION_TARGET",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point1",
+            "default": ""
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "time",
+            "default": "2000"
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "job",
+            "default": "1"
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point2",
+            "default": ""
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "target",
+            "default": "",
+            "options": [
+              { "label": "target1", "value": "laser_target1" },
+              { "label": "target2", "value": "laser_target2" },
+              { "label": "target3", "value": "laser_target3" },
+              { "label": "target4", "value": "laser_target4" },
+              { "label": "target5", "value": "laser_target5" },
+              { "label": "target6", "value": "laser_target6" },
+              { "label": "target7", "value": "laser_target7" },
+              { "label": "target8", "value": "laser_target8" },
+              { "label": "target9", "value": "laser_target9" },
+              { "label": "target10", "value": "laser_target10" },
+              { "label": "target11", "value": "laser_target11" },
+              { "label": "target12", "value": "laser_target12" },
+              { "label": "target13", "value": "laser_target13" },
+              { "label": "target14", "value": "laser_target14" },
+              { "label": "target15", "value": "laser_target15" },
+              { "label": "target16", "value": "laser_target16" },
+              { "label": "target17", "value": "laser_target17" },
+              { "label": "target18", "value": "laser_target18" },
+              { "label": "target19", "value": "laser_target19" },
+              { "label": "target20", "value": "laser_target20" },
+              { "label": "target21", "value": "laser_target21" },
+              { "label": "target22", "value": "laser_target22" },
+              { "label": "target23", "value": "laser_target23" },
+              { "label": "target24", "value": "laser_target24" },
+              { "label": "target25", "value": "laser_target25" },
+              { "label": "target26", "value": "laser_target26" },
+              { "label": "target27", "value": "laser_target27" },
+              { "label": "target28", "value": "laser_target28" },
+              { "label": "target29", "value": "laser_target29" },
+              { "label": "target30", "value": "laser_target30" },
+              { "label": "target31", "value": "laser_target31" },
+              { "label": "target32", "value": "laser_target32" },
+              { "label": "target33", "value": "laser_target33" },
+              { "label": "target34", "value": "laser_target34" },
+              { "label": "target35", "value": "laser_target35" },
+              { "label": "target36", "value": "laser_target36" },
+              { "label": "target37", "value": "laser_target37" },
+              { "label": "target38", "value": "laser_target38" },
+              { "label": "target39", "value": "laser_target39" },
+              { "label": "target40", "value": "laser_target40" },
+              { "label": "target41", "value": "laser_target41" },
+              { "label": "target42", "value": "laser_target42" },
+              { "label": "target43", "value": "laser_target43" },
+              { "label": "target44", "value": "laser_target44" },
+              { "label": "target45", "value": "laser_target45" },
+              { "label": "target46", "value": "laser_target46" },
+              { "label": "target47", "value": "laser_target47" },
+              { "label": "target48", "value": "laser_target48" },
+              { "label": "target49", "value": "laser_target49" },
+              { "label": "target50", "value": "laser_target50" }
+            ]
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "MovL({dobot_teach_point1})\nWait({time})\nlocal laser_pos = LaserPositioning({dobot_teach_point1}, {job})\nif laser_pos == nil then\n   error(\"Laser positioning failed！\")\nend\n{target} = {point = {pose = {laser_pos[1], laser_pos[2], laser_pos[3], {dobot_teach_point2}.pose[4], {dobot_teach_point2}.pose[5], {dobot_teach_point2}.pose[6]}}, user={dobot_teach_point2}.user, tool={dobot_teach_point2}.tool} \n"
+    ]
+  },
+  {
+    "block_name": "MovToLaserPosTarget1",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_MOV_TO_TARGET",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "target",
+            "default": "",
+            "options": [
+              { "label": "target1", "value": "laser_target1" },
+              { "label": "target2", "value": "laser_target2" },
+              { "label": "target3", "value": "laser_target3" },
+              { "label": "target4", "value": "laser_target4" },
+              { "label": "target5", "value": "laser_target5" },
+              { "label": "target6", "value": "laser_target6" },
+              { "label": "target7", "value": "laser_target7" },
+              { "label": "target8", "value": "laser_target8" },
+              { "label": "target9", "value": "laser_target9" },
+              { "label": "target10", "value": "laser_target10" },
+              { "label": "target11", "value": "laser_target11" },
+              { "label": "target12", "value": "laser_target12" },
+              { "label": "target13", "value": "laser_target13" },
+              { "label": "target14", "value": "laser_target14" },
+              { "label": "target15", "value": "laser_target15" },
+              { "label": "target16", "value": "laser_target16" },
+              { "label": "target17", "value": "laser_target17" },
+              { "label": "target18", "value": "laser_target18" },
+              { "label": "target19", "value": "laser_target19" },
+              { "label": "target20", "value": "laser_target20" },
+              { "label": "target21", "value": "laser_target21" },
+              { "label": "target22", "value": "laser_target22" },
+              { "label": "target23", "value": "laser_target23" },
+              { "label": "target24", "value": "laser_target24" },
+              { "label": "target25", "value": "laser_target25" },
+              { "label": "target26", "value": "laser_target26" },
+              { "label": "target27", "value": "laser_target27" },
+              { "label": "target28", "value": "laser_target28" },
+              { "label": "target29", "value": "laser_target29" },
+              { "label": "target30", "value": "laser_target30" },
+              { "label": "target31", "value": "laser_target31" },
+              { "label": "target32", "value": "laser_target32" },
+              { "label": "target33", "value": "laser_target33" },
+              { "label": "target34", "value": "laser_target34" },
+              { "label": "target35", "value": "laser_target35" },
+              { "label": "target36", "value": "laser_target36" },
+              { "label": "target37", "value": "laser_target37" },
+              { "label": "target38", "value": "laser_target38" },
+              { "label": "target39", "value": "laser_target39" },
+              { "label": "target40", "value": "laser_target40" },
+              { "label": "target41", "value": "laser_target41" },
+              { "label": "target42", "value": "laser_target42" },
+              { "label": "target43", "value": "laser_target43" },
+              { "label": "target44", "value": "laser_target44" },
+              { "label": "target45", "value": "laser_target45" },
+              { "label": "target46", "value": "laser_target46" },
+              { "label": "target47", "value": "laser_target47" },
+              { "label": "target48", "value": "laser_target48" },
+              { "label": "target49", "value": "laser_target49" },
+              { "label": "target50", "value": "laser_target50" }
+            ]
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "speed",
+            "default": "10"
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "MovL({target}.point, {user={target}.user, tool={target}.tool, speed = {speed}})\n"
+    ]
+  },
+  {
+    "block_name": "CommonLaserOffset",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_30",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "x",
+            "default": "0"
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "y",
+            "default": "0"
+          },
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "z",
+            "default": "0"
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_user_coordinate",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "CommonLaserOffset({x},{y},{z},{dobot_user_coordinate})\n"
+    ]
+  },
+  {
+    "block_name": "CommonLaserTrackStartNew",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_28",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "takNumber",
+            "default": "1"
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_tool_coordinate",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": [
+      "CommonLaserTrackStart({takNumber},{dobot_tool_coordinate})\n"
+    ]
+  },
+  {
+    "block_name": "CommonLaserTrackEnd",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_29",
+        "params": []
+      }
+    ],
+    "block_code": ["CommonLaserTrackEnd()\n"]
+  },
+  {
+    "block_name": "FullVLaserCali",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_LASER_CALI_FULLV_PARAMS_CONFIG",
+      "page": "LaserCali.html",
+      "width": 700,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_CALI_FULLV",
+        "params": []
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "FullVLaserCaliPoint",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "FullVLaserCaliParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "FullVLaserCaliLua",
+            "default": "ReportEcoStop(Language.trLang(\"PLEASE_CONFIG_BLOCK_FIRST\"))\n"
+          }
+        ]
+      }
+    ],
+    "block_code": ["{FullVLaserCaliLua}"]
+  },
+  {
+    "block_name": "LaserCali",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_LASER_CALI_Intelligen_PARAMS_CONFIG",
+      "page": "LaserCali.html",
+      "width": 700,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_LASER_CALI_Intelligen",
+        "params": []
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserCaliPoint",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserCaliParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserCaliLua",
+            "default": "ReportEcoStop(Language.trLang(\"PLEASE_CONFIG_BLOCK_FIRST\"))\n"
+          }
+        ]
+      }
+    ],
+    "block_code": ["{laserCaliLua}"]
+  },
+  {
+    "block_name": "WeldMultiPassStart",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_1",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "passNumber",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": ["WeldMultiPassStart({passNumber})\n"]
+  },
+  {
+    "block_name": "WeldMultiPassWeldStartOffsetMovL",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_11",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point1",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": ["PreMovL({dobot_teach_point1})\n"]
+  },
+  {
+    "block_name": "WeldMultiPassWeldStartOffsetArc",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_12",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point1",
+            "default": ""
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point2",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": ["PreArc({dobot_teach_point1},{dobot_teach_point2})\n"]
+  },
+  {
+    "block_name": "WeldMultiPassEnd",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_2",
+        "params": []
+      }
+    ],
+    "block_code": ["WeldMultiPassEnd()\n"]
+  },
+  {
+    "block_name": "WeldMultiPassGroup",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_31",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "groupIndex",
+            "default": "1"
+          },
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point1",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "message": "%1",
+        "params": [
+          {
+            "param_type": "input_statement",
+            "data_type": "",
+            "name": "substack1",
+            "default": ""
+          }
+        ]
+      },
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_32",
+        "params": [
+          {
+            "param_type": "field_dropdown",
+            "data_type": "",
+            "name": "dobot_teach_point2",
+            "default": ""
+          }
+        ]
+      }
+    ],
+    "block_code": ["local group = GetWeldMultiPassGroup({groupIndex})\nfor k, v in pairs(group) do\n  MovL({dobot_teach_point1})\n  WeldMultiPassStart(v)\n{substack1}\n  WeldMultiPassEnd()\n  MovL({dobot_teach_point2})\nend\n"]
+  },
+  {
+    "block_name": "NewArcTrackStart",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_5",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "trackNumber",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": ["ArcTrackStart({trackNumber})\n"]
+  },
+  {
+    "block_name": "ArcTrackEnd",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_6",
+        "params": []
+      }
+    ],
+    "block_code": ["ArcTrackEnd()\n"]
+  },
+  {
+    "block_name": "LaserTemplate",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_BLOCK_BY_ID_16",
+      "page": "LaserTemplate.html",
+      "width": 750,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_16",
+        "params": []
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "approachPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "startPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "endPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "leavingPointParams",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "middlePointParams",
+            "default": "{}"
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "params",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "pointConfigList",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "laserTemplateLua",
+            "default": "ReportEcoStop(Language.trLang(\"PLEASE_CONFIG_BLOCK_FIRST\"))\n"
+          }
+        ]
+      }
+    ],
+    "block_code": ["{laserTemplateLua}"]
+  },
+  {
+    "block_name": "WeldLaserParams",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_13",
+        "params": [
+          {
+            "param_type": "input_value",
+            "data_type": "math_number",
+            "name": "number",
+            "default": "1"
+          }
+        ]
+      }
+    ],
+    "block_code": ["WeldLaserParams({number})\n"]
+  },
+  {
+    "block_name": "WeldLaserStart",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_14",
+        "params": []
+      }
+    ],
+    "block_code": ["WeldLaserStart()\n"]
+  },
+  {
+    "block_name": "WeldLaserEnd",
+    "func_page": false,
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_15",
+        "params": []
+      }
+    ],
+    "block_code": ["WeldLaserEnd()\n"]
+  },
+  {
+    "block_name": "IntermittentWelding",
+    "block_color": "#4D7DDD",
+    "block_type": "shape_statement",
+    "block_popup": {
+      "title": "DOBOTPLUS_WELD_BLOCK_BY_ID_27",
+      "page": "IntermittentWelding.html",
+      "width": 700,
+      "height": 450,
+      "position": "center center"
+    },
+    "block_configs": [
+      {
+        "message": "DOBOTPLUS_WELD_BLOCK_BY_ID_27",
+        "params": []
+      },
+      {
+        "message": "",
+        "isHidden": true,
+        "params": [
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "pointList",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "params",
+            "default": ""
+          },
+          {
+            "param_type": "field_input",
+            "data_type": "text",
+            "name": "intermittentWeldingLua",
+            "default": "ReportEcoStop(Language.trLang(\"PLEASE_CONFIG_BLOCK_FIRST\"))\n"
+          }
+        ]
+      }
+    ],
+    "block_code": ["{intermittentWeldingLua}"]
+  }
+]
